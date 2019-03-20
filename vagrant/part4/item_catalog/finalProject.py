@@ -16,7 +16,12 @@ session = DBSession()
 @app.route('/')
 @app.route('/restaurants')
 def showRestaurants():
-    return render_template('restaurants.html')
+    try:
+        restaurants = session.query(Restaurant).all()
+    except Exception as e:
+        return str(e)
+    else:
+        return render_template('restaurants.html', restaurants = restaurants)
 
 @app.route('/restaurant/new/')
 def newRestaurant():

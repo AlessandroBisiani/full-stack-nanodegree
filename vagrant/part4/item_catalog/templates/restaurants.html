@@ -9,8 +9,28 @@
 <body>
         <div class="main-wrapper">
             <h1 class="heading title">YOW!</h1>
-            <!-- <h2 class="heading page-heading">{{restaurant.name}}</h2> -->
             <div class="main">
-            
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul>
+                            {% for message in messages %}
+                            <li><strong> {{message}} </strong></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+
+            <a href="{{url_for('newRestaurant')}}">Create New Restaurant</a>
+
+            <div class="main__item-list">
+                {% for rest in restaurants %}
+                    <div class="restaurant">
+                        <a href="{{url_for('showMenu', restaurant_id = rest.id)}}">{{rest.name}}</a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            </div>
+        </div>
 </body>
 </html>
