@@ -72,7 +72,7 @@ def newMenuItem(restaurant_id):
         flash('Method "{}" Not Supported'.format(request.method))
         return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 
-@app.route('/restaurant/<int:restaurant_id>/menu/edit')
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods = ['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
     if request.method =='GET':
         try:
@@ -96,7 +96,7 @@ def editMenuItem(restaurant_id, menu_id):
         flash('Method "{}" Not Supported'.format(request.method))
         return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 
-@app.route('/restaurant/<int:restaurant_id>/menu/<menu_id>/delete', methods = ['GET', 'POST'])
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete', methods = ['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
     try:
         deletionItem = session.query(MenuItem).filter_by(id = menu_id).one()

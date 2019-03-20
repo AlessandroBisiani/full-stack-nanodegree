@@ -7,6 +7,8 @@
 </head>
 <body>
     <div class="main-wrapper">
+        <h1 class="heading title">YOW!</h1>
+        <h2 class="heading page-heading">Edit Menu Item</h2>
         <div class="main">
             <form action= "{{url_for('editMenuItem', restaurant_id = restaurant_id, menu_id=item.id)}}" method = 'POST'>
 
@@ -15,7 +17,7 @@
 
             <input type='submit' value='Edit'>
             </form>
-            <a href= '{{url_for('restaurantMenu', restaurant_id= item.restaurant_id)}}'>Cancel</a>
+            <a href= "{{url_for('showMenu', restaurant_id= item.restaurant_id)}}">Cancel</a>
         </div>
     </div>
 </body>
