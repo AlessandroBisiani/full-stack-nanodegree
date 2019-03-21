@@ -5,13 +5,20 @@ All substantial coursework, any notes, any miniprojects, and any supporting file
 <br>
 
 ## Contents
-### Part 3
-| Path      | Contents                                                                              |
-|-----------|---------------------------------------------------------------------------------------|
-| part 3/   | Database setup files, Toy Webserver, Logs Analysis project (readme in this directory) |
-
+Everything below can be found under /vagrant/
 ### Part 4
-| Path      |           | Contents                                                          |
-|-----------|-----------|-------------------------------------------------------------------|
-| part 4/   | crud1+2/  | Working with CRUD, Making a Web Server                            |
-|           |           |                                                                   |
+| Path      |               | Contents                                                                  |
+|-----------|---------------|---------------------------------------------------------------------------|
+| part 4/   | crud1+2/      | Working with CRUD, Making a Web Server                                    |
+|           | flask/        | Lesson 3. A Basic flask application; precursory to Item Catalog Project   |
+|           | item_catalog/ | Lesson 4. Final project (Item Catalog) initial version                    |
+
+### Part 3
+| Path      | Contents                                                                                  |
+|-----------|-------------------------------------------------------------------------------------------|
+| part 3/   | Database setup files, Toy Webserver, Logs Analysis project (readme in this directory)     |
+
+### Parts 1&2
+| Path      |                       | Contents                                                          |
+|-----------|-----------------------|-------------------------------------------------------------------|
+| parts1&2/ | forum/, tournament/   | Forum and tournament toy examples                                 |
