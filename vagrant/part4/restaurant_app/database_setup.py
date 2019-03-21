@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 import os
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -14,6 +15,15 @@ class Restaurant(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
 
+    @property
+    def serialize(self):
+        """Return serializable restaurant data
+        """
+        return {
+            'id'    : self.id,
+            'name'  : self.name
+        }
+
 
 class MenuItem(Base):
     __tablename__ = 'menu_item'
@@ -28,7 +38,8 @@ class MenuItem(Base):
 
     @property
     def serialize(self):
-        # return serializable object data
+        """ return serializable menu item data
+        """
         return {
             'course'        : self.course,
             'description'   : self.description,

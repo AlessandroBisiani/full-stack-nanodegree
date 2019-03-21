@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+#! /usr/bin/env python3
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy import create_engine
@@ -12,6 +13,24 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+@app.route('/restaurants/JSON')
+def showRestaurantsJSON():
+    try:
+        restaurants = session.query(Restaurant).all()
+    except Exception as e:
+        return str(e)
+    else:
+        return jsonify(Restaurants = [r.serialize for r in restaurants])
+
+@app.route('/restaurant/<int:restaurant_id>/menu/JSON')
+def showMenuJSON(restaurant_id):
+    menu = session.query(MenuItem).filter_by(restaurant_id = restaurant_id)
+    return jsonify(Menu = [item.serialize for item in menu])
+
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
+def showMenuItemJSON(restaurant_id, menu_id):
+    item = session.query(MenuItem).filter_by(restaurant_id = restaurant_id, id = menu_id).one()
+    return jsonify(item.serialize)
 
 @app.route('/')
 @app.route('/restaurants')
@@ -22,7 +41,8 @@ def showRestaurants():
         except Exception as e:
             return str(e)
         else:
-            return render_template('restaurants.html', restaurants = restaurants)
+            return render_template('restaurants.html',
+                                   restaurants = restaurants)
     else:
         flash('Method "{}" Not Supported'.format(request.method))
         return redirect(url_for('showMenu', restaurant_id = restaurant_id))
