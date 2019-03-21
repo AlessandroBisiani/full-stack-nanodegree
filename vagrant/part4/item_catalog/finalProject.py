@@ -16,24 +16,88 @@ session = DBSession()
 @app.route('/')
 @app.route('/restaurants')
 def showRestaurants():
+    if request.method == 'GET':
+        try:
+            restaurants = session.query(Restaurant).all()
+        except Exception as e:
+            return str(e)
+        else:
+            return render_template('restaurants.html', restaurants = restaurants)
+    else:
+        flash('Method "{}" Not Supported'.format(request.method))
+        return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+
+@app.route('/restaurant/new/', methods = ['GET', 'POST'])
+def newRestaurant():
+    if request.method == 'GET':
+        return render_template('newRestaurant.html')
+    elif request.method == 'POST':
+        try:
+            newRestaurant = Restaurant(name = request.form['name'])
+            session.add(newRestaurant)
+            session.commit()
+        except Exception as e:
+            return str(e)
+        else:
+            return redirect(url_for('showRestaurants'))
+    else:
+        flash('Method "{}" Not Supported'.format(request.method))
+        return redirect(url_for('showRestaurants'))
+
+@app.route('/restaurant/<int:restaurant_id>/edit', methods = ['GET', 'POST'])
+def editRestaurant(restaurant_id):
+    if request.method == 'GET':
+        try:
+            restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+        except Exception as e:
+            return str(e)
+        else:
+            return render_template('editRestaurant.html', restaurant = restaurant)
+    elif request.method == 'POST':
+        try:
+            restaurant_edit = session.query(Restaurant).filter_by(id = restaurant_id).one()
+            oldName = restaurant_edit.name[:]
+            newName = request.form['newName']
+            restaurant_edit.name = newName
+            session.add(restaurant_edit)
+            session.commit()
+            flash('{} changed to {}'.format(oldName, newName))
+        except Exception as e:
+            return str(e)
+        else:
+            return redirect(url_for('showRestaurants'))
+    else:
+        flash('Method "{}" Not Supported'.format(request.method))
+        return redirect(url_for('showRestaurants'))
+
+@app.route('/restaurant/<int:restaurant_id>/delete', methods = ['GET', 'POST'])
+def deleteRestaurant(restaurant_id):
     try:
-        restaurants = session.query(Restaurant).all()
+        restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     except Exception as e:
         return str(e)
     else:
-        return render_template('restaurants.html', restaurants = restaurants)
-
-@app.route('/restaurant/new/')
-def newRestaurant():
-    return render_template('newRestaurant.html')
-
-@app.route('/restaurant/restaurant_id/edit')
-def editRestaurant():
-    return render_template('editRestaurant.html')
-
-@app.route('/restaurant/<int:restaurant_id>/delete')
-def deleteRestaurant():
-    return render_template('deleteRestaurant.html')
+        if request.method == 'GET':
+            return render_template('deleteRestaurant.html', restaurant = restaurant)
+        elif request.method == 'POST':
+            try:
+                name = restaurant.name[:]
+                session.delete(restaurant)
+                session.commit()
+                menu_delete = session.query(MenuItem).filter_by(restaurant_id = restaurant_id).all()
+                for mItem in menu_delete:
+                    iName = mItem.name[:]
+                    session.delete(mItem)
+                    session.commit()
+                    flash("{} deleted".format(iName))
+                flash('You deleted {}'.format(name))
+            except Exception as e:
+                return str(e)
+            else:
+                return redirect(url_for('showRestaurants'))
+        else:
+            flash('Method "{}" Not Supported'.format(request.method))
+            return redirect(url_for('showRestaurants'))
 
 @app.route('/restaurant/<int:restaurant_id>/')
 @app.route('/restaurant/<int:restaurant_id>/menu')
@@ -42,9 +106,10 @@ def showMenu(restaurant_id):
         try:
             restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
             items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id).all()
-            return render_template('menu.html', restaurant = restaurant, items = items)
         except Exception as e:
             return str(e)
+        else:
+            return render_template('menu.html', restaurant = restaurant, items = items)
     else:
         flash('Method "{}" Not Supported'.format(request.method))
         return redirect(url_for('showMenu', restaurant_id = restaurant_id))
@@ -63,7 +128,7 @@ def newMenuItem(restaurant_id):
             newItem = MenuItem(name = request.form['name'], restaurant_id = restaurant_id)
             session.add(newItem)
             session.commit()
-            flash("New Menu Item Created")
+            flash('New Menu Item Created')
         except Exception as e:
             return str(e)
         else:
@@ -87,6 +152,7 @@ def editMenuItem(restaurant_id, menu_id):
             item_to_edit.name = request.form['name']
             session.add(item_to_edit)
             session.commit()
+            flash('Edited menu item')
         except Exception as e:
             return str(e)
         else:
@@ -102,19 +168,21 @@ def deleteMenuItem(restaurant_id, menu_id):
         deletionItem = session.query(MenuItem).filter_by(id = menu_id).one()
     except Exception as e:
         return str(e)
-    if request.method == 'GET':
-        return render_template('deletemenuitem.html', item = deletionItem)
-    elif request.method == 'POST':
-        try:
-            session.delete(deletionItem)
-            session.commit()
-            flash("Menu Item Deleted")
-            return redirect(url_for('showMenu', restaurant_id = restaurant_id))
-        except Exception as e:
-            return str(e)
     else:
-        flash('Method "{}" Not Supported'.format(request.method))
-        return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+        if request.method == 'GET':
+            return render_template('deletemenuitem.html', item = deletionItem)
+        elif request.method == 'POST':
+            try:
+                session.delete(deletionItem)
+                session.commit()
+                flash("Menu Item Deleted")
+            except Exception as e:
+                return str(e)
+            else:
+                return redirect(url_for('showMenu', restaurant_id = restaurant_id))
+        else:
+            flash('Method "{}" Not Supported'.format(request.method))
+            return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 
 if __name__ == '__main__':
     app.secret_key = 'secret'

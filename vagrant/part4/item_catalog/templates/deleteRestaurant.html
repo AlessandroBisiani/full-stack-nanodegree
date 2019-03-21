@@ -7,6 +7,15 @@
     <title>Delete Resturant</title>
 </head>
 <body>
-
+    <div class="main-wrapper">
+        <h1 class="heading title">YOW!</h1>
+        <h2 class="heading page-heading">Delete Restaurant</h2>
+        <div class="main">
+            <form action="{{url_for('deleteRestaurant', restaurant_id = restaurant.id)}}" method="POST">
+                <p>Are you sure you want to delete {{restaurant.name}}:</p>
+                <input type='submit', value = 'Delete'>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

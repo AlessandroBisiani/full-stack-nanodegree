@@ -7,6 +7,17 @@
     <title>Edit Restaurant</title>
 </head>
 <body>
+    <div class="main-wrapper">
+        <h1 class="heading title">YOW!</h1>
+        <h2 class="heading page-heading">Edit {{restaurant.name}}</h2>
+        <div class="main">
+            <form action="{{url_for('editRestaurant', restaurant_id = restaurant.id)}}" method="POST">
+                <p>Enter New Restaurant Name:</p>
+                <input type="text" size="40" name="newName">
+                <input type="submit" value="Change Name">
+            </form>
 
+        </div>
+    </div>
 </body>
 </html>
