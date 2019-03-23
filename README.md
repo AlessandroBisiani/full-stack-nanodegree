@@ -11,7 +11,8 @@ Everything below can be found under /vagrant/
 |-----------|---------------|---------------------------------------------------------------------------|
 | part 4/   | crud1+2/      | Working with CRUD, Making a Web Server                                    |
 |           | flask/        | Lesson 3. A Basic flask application; precursory to Item Catalog Project   |
-|           | item_catalog/ | Lesson 4. Final project (Item Catalog) initial version                    |
+|           | item_catalog/ | Lesson 4. Item-catalog-style restaurant app                               |
+|           | OAuth2.0      | Lesson 6. Implemented Google sign-in on retaurant app                     |
 
 ### Part 3
 | Path      | Contents                                                                                  |
@@ -22,3 +23,6 @@ Everything below can be found under /vagrant/
 | Path      |                       | Contents                                                          |
 |-----------|-----------------------|-------------------------------------------------------------------|
 | parts1&2/ | forum/, tournament/   | Forum and tournament toy examples                                 |
+
+## TODO
+* Add part4/ readme.md
