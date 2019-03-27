@@ -1,4 +1,4 @@
-#original: https://github.com/udacity/APIs/blob/master/Lesson_3
+# original: https://github.com/udacity/APIs/blob/master/Lesson_3
 #           /06_Adding%20Features%20to%20your%20Mashup/Starter%20Code/
 
 from findARestaurant import findARestaurant
@@ -35,15 +35,52 @@ session = DBSession()
 app = Flask(__name__)
 
 
-@app.route('/restaurants', methods = ['GET', 'POST'])
+@app.route('/restaurants', methods=['GET', 'POST'])
 def all_restaurants_handler():
-  #YOUR CODE HERE
+    if request.method == 'GET':
+        restaurant_data = session.query(Restaurant).all()
+        restaurants = []
+        for r in restaurant_data:
+            restaurants.append(r.serialize)
+        return jsonify(restaurants)
+
+    elif request.method == 'POST':
+        location = request.args.get('location')
+        mealType = request.args.get('mealType')
+        r_dict = findARestaurant(mealType, location)
+
+        pre_existent_entry = session.query(Restaurant).filter_by(
+                restaurant_name=r_dict['name'],
+                restaurant_address=r_dict['address']).first()
+
+        # Check the restaurant hasn't already been added.
+        # Return it without adding to the db, if it has.
+        if pre_existent_entry == None:
+            new_Restaurant = Restaurant(
+                    restaurant_name=r_dict['name'],
+                    restaurant_address=r_dict['address'],
+                    restaurant_image=r_dict['image']
+                    )
+            print('\r\n---------------created the restaurant')
+            # print(r_dict['name'], r_dict['address'], r_dict['image'])
+            session.add(new_Restaurant)
+            session.commit()
+            # print('New restaurant added to the database.')
+            return jsonify(new_Restaurant.serialize)
+        else:
+            return jsonify(pre_existent_entry.serialize)
+    else:
+        return '{} not supported at this endpoint'.format(request.method)
 
 
-@app.route('/restaurants/<int:id>', methods = ['GET','PUT', 'DELETE'])
+@app.route('/restaurants/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def restaurant_handler(id):
-  #YOUR CODE HERE
-
+    if request.method == 'GET':
+        pass
+    if request.method == 'PUT':
+        pass
+    if request.method == 'DELETE':
+        pass
 
 
 if __name__ == '__main__':
