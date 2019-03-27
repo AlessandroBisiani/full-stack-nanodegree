@@ -3,9 +3,10 @@
 
 from findARestaurant import findARestaurant
 from models import Base, Restaurant
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, flash, redirect, url_for
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import create_engine
 
 import sys
@@ -38,11 +39,8 @@ app = Flask(__name__)
 @app.route('/restaurants', methods=['GET', 'POST'])
 def all_restaurants_handler():
     if request.method == 'GET':
-        restaurant_data = session.query(Restaurant).all()
-        restaurants = []
-        for r in restaurant_data:
-            restaurants.append(r.serialize)
-        return jsonify(restaurants)
+        restaurants = session.query(Restaurant).all()
+        return jsonify(restaurants = [r.serialize for r in restaurants])
 
     elif request.method == 'POST':
         location = request.args.get('location')
@@ -55,7 +53,7 @@ def all_restaurants_handler():
 
         # Check the restaurant hasn't already been added.
         # Return it without adding to the db, if it has.
-        if pre_existent_entry == None:
+        if pre_existent_entry is None:
             new_Restaurant = Restaurant(
                     restaurant_name=r_dict['name'],
                     restaurant_address=r_dict['address'],
@@ -76,13 +74,24 @@ def all_restaurants_handler():
 @app.route('/restaurants/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def restaurant_handler(id):
     if request.method == 'GET':
-        pass
-    if request.method == 'PUT':
-        pass
-    if request.method == 'DELETE':
-        pass
+        try:
+            restaurant = session.query(Restaurant).filter_by(id=id).one()
+        except NoResultFound:
+            return redirect(url_for('all_restaurants_handler'))
+        except Exception as ex:
+            flash(str(ex))
+            return redirect(url_for('all_restaurants_handler'))
+        else:
+            return jsonify(restaurant.serialize)
+    elif request.method == 'PUT':
+        return 'put'
+    elif request.method == 'DELETE':
+        return 'delete'
+    else:
+        return 'TODO end of /restaurants/<id>'
 
 
 if __name__ == '__main__':
+    app.secret_key = 'Troubling troubadours'
     app.debug = True
     app.run(host='0.0.0.0', port=5000)
