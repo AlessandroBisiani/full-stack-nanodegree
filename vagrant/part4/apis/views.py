@@ -40,7 +40,7 @@ app = Flask(__name__)
 def all_restaurants_handler():
     if request.method == 'GET':
         restaurants = session.query(Restaurant).all()
-        return jsonify(restaurants = [r.serialize for r in restaurants])
+        return jsonify(restaurants=[r.serialize for r in restaurants])
 
     elif request.method == 'POST':
         location = request.args.get('location')
@@ -114,12 +114,21 @@ def restaurant_handler(id):
             return redirect(url_for('all_restaurants_handler'))
 
     elif request.method == 'DELETE':
-        restaurant = session.query(Restaurant).filter_by(id=id).one()
-        session.delete(restaurant)
-        session.commit()
-        return 'Restaurant {} deleted'.format(id)
+        try:
+            restaurant = session.query(Restaurant).filter_by(id=id).one()
+            session.delete(restaurant)
+            session.commit()
+
+        except NoResultFound:
+            return redirect(url_for('all_restaurants_handler'))
+        except Exception as ex:
+            flash(str(ex))
+            return redirect(url_for('all_restaurants_handler'))
+        else:
+            return 'Restaurant {} deleted'.format(id)
+
     else:
-        return 'TODO end of /restaurants/<id>'
+        return '{} not supported at this endpoint'.format(request.method)
 
 
 if __name__ == '__main__':
