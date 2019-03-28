@@ -114,8 +114,10 @@ def restaurant_handler(id):
             return redirect(url_for('all_restaurants_handler'))
 
     elif request.method == 'DELETE':
-        
-        return 'delete'
+        restaurant = session.query(Restaurant).filter_by(id=id).one()
+        session.delete(restaurant)
+        session.commit()
+        return 'Restaurant {} deleted'.format(id)
     else:
         return 'TODO end of /restaurants/<id>'
 
