@@ -76,6 +76,7 @@ def restaurant_handler(id):
     if request.method == 'GET':
         try:
             restaurant = session.query(Restaurant).filter_by(id=id).one()
+
         except NoResultFound:
             return redirect(url_for('all_restaurants_handler'))
         except Exception as ex:
@@ -83,9 +84,37 @@ def restaurant_handler(id):
             return redirect(url_for('all_restaurants_handler'))
         else:
             return jsonify(restaurant.serialize)
+
     elif request.method == 'PUT':
-        return 'put'
+
+        r_name = request.args.get('name')
+        r_address = request.args.get('address')
+        r_image = request.args.get('image')
+        # print(r_name, r_location, r_image)
+        if r_name and r_address and r_image:
+            try:
+                restaurant = session.query(Restaurant).filter_by(id=id).one()
+                restaurant.restaurant_name = r_name
+                restaurant.restaurant_address = r_address
+                restaurant.restaurant_image = r_image
+                session.add(restaurant)
+                session.commit()
+
+            except NoResultFound:
+                # print('1 ~~~~~~~~~~~~~~~~~~~~')
+                return redirect(url_for('all_restaurants_handler'))
+            except Exception as ex:
+                flash(str(ex))
+                # print('2 ~~~~~~~~~~~~~~~~~~~~')
+                return redirect(url_for('all_restaurants_handler'))
+            else:
+                return jsonify(restaurant.serialize)
+        else:
+            # print('3 ~~~~~~~~~~~~~~~~~~~~')
+            return redirect(url_for('all_restaurants_handler'))
+
     elif request.method == 'DELETE':
+        
         return 'delete'
     else:
         return 'TODO end of /restaurants/<id>'
