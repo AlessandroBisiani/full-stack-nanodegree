@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 
-from flask.ext.httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth
 import json
 
 #NEW IMPORTS
@@ -95,21 +95,18 @@ def login(provider):
         #     return response
         print "Step 2 Complete! Access Token : %s " % credentials.access_token
 
-        #STEP 3 - Find User or make a new one
 
+        #STEP 3 - Find User or make a new one
         #Get user info
         h = httplib2.Http()
         userinfo_url =  "https://www.googleapis.com/oauth2/v1/userinfo"
         params = {'access_token': credentials.access_token, 'alt':'json'}
         answer = requests.get(userinfo_url, params=params)
-
         data = answer.json()
 
         name = data['name']
         picture = data['picture']
         email = data['email']
-
-
 
         #see if user exists, if it doesn't make a new one
         user = session.query(User).filter_by(email=email).first()
@@ -117,12 +114,13 @@ def login(provider):
             user = User(username = name, picture = picture, email = email)
             session.add(user)
             session.commit()
-
+            print('Added me')
+        else:
+            print('User already exists')
 
 
         #STEP 4 - Make token
         token = user.generate_auth_token(600)
-
 
 
         #STEP 5 - Send back token to the client
@@ -165,12 +163,6 @@ def get_user(id):
     if not user:
         abort(400)
     return jsonify({'username': user.username})
-
-@app.route('/api/resource')
-@auth.login_required
-def get_resource():
-    return jsonify({ 'data': 'Hello, %s!' % g.user.username })
-
 
 
 if __name__ == '__main__':
